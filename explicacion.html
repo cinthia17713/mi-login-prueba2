@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seguridad en Supabase - Explicación</title>
+<style>
+  :root {
+    --bg: #f4f6f8;
+    --card-bg: #ffffff;
+    --text: #1a1a2e;
+    --muted: #6b7280;
+    --accent: #4f46e5;
+    --border: #e5e7eb;
+    --tag-enabled-bg: #dcfce7;
+    --tag-enabled-text: #166534;
+    --tag-disabled-bg: #fee2e2;
+    --tag-disabled-text: #991b1b;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f1117;
+      --card-bg: #1a1d27;
+      --text: #f1f1f5;
+      --muted: #9ca3af;
+      --accent: #6366f1;
+      --border: #2d303c;
+      --tag-enabled-bg: #064e3b;
+      --tag-enabled-text: #a7f3d0;
+      --tag-disabled-bg: #7f1d1d;
+      --tag-disabled-text: #fecaca;
+    }
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 40px 20px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 800px;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  header h1 {
+    font-size: 26px;
+    margin-bottom: 8px;
+  }
+
+  header p {
+    color: var(--muted);
+    font-size: 15px;
+  }
+
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+  }
+
+  .feature-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  h3 {
+    margin: 0;
+    font-size: 18px;
+    color: var(--accent);
+  }
+
+  .badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .badge.enabled {
+    background: var(--tag-enabled-bg);
+    color: var(--tag-enabled-text);
+  }
+
+  .badge.disabled {
+    background: var(--tag-disabled-bg);
+    color: var(--tag-disabled-text);
+  }
+
+  p {
+    margin: 8px 0;
+    line-height: 1.5;
+    font-size: 14px;
+  }
+
+  .explanation {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--border);
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  .logout-btn {
+    display: block;
+    width: 100%;
+    max-width: 200px;
+    margin: 30px auto 0;
+    padding: 10px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s;
+    text-decoration: none;
+  }
+
+  .logout-btn:hover {
+    background: var(--border);
+  }
+</style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>🎓 Panel de Clase: Configuraciones de Seguridad en Supabase</h1>
+      <p>Explicación de las opciones al crear un proyecto conectado a GitHub Pages</p>
+    </header>
+
+    <!-- Opción 1 -->
+    <div class="card">
+      <div class="feature-header">
+        <h3>1. Enable Data API</h3>
+        <span class="badge enabled">Recomendado: Activado ✅</span>
+      </div>
+      <p><strong>Qué es:</strong> Genera automáticamente una API REST sobre tu base de datos PostgreSQL utilizando PostgREST.</p>
+      <div class="explanation">
+        <strong>Por qué usarse:</strong> Es indispensable para sitios estáticos en GitHub Pages. Permite que el frontend consulte o inserte datos directamente mediante solicitudes HTTP utilizando la librería de JavaScript.
+      </div>
+    </div>
+
+    <!-- Opción 2 -->
+    <div class="card">
+      <div class="feature-header">
+        <h3>2. Automatically expose new tables</h3>
+        <span class="badge disabled">Recomendado: Desactivado ❌</span>
+      </div>
+      <p><strong>Qué es:</strong> Otorga permisos automáticos a los roles de la API pública cada vez que creas una tabla nueva.</p>
+      <div class="explanation">
+        <strong>Por qué usarse:</strong> Sigue el <em>principio de mínimo privilegio</em>. Si se deja activo, cualquier tabla nueva que crees quedará expuesta públicamente por defecto. Desactivarlo te obliga a dar permisos de manera consciente.
+      </div>
+    </div>
+
+    <!-- Opción 3 -->
+    <div class="card">
+      <div class="feature-header">
+        <h3>3. Enable automatic RLS (Row Level Security)</h3>
+        <span class="badge enabled">Recomendado: Activado ✅</span>
+      </div>
+      <p><strong>Qué es:</strong> Un disparador (trigger) que activa automáticamente la seguridad a nivel de fila en cada tabla nueva.</p>
+      <div class="explanation">
+        <strong>Por qué usarse:</strong> Actúa como red de seguridad. Evita que una tabla expuesta en la API entregue información a menos que existan políticas (Policies) explícitas que autoricen la lectura o escritura de datos.
+      </div>
+    </div>
+
+    <a href="index.html" class="logout-btn">Volver al Login</a>
+  </div>
+
+</body>
+</html>
