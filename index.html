@@ -3,9 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login con Tabla Personalizada en Supabase</title>
+<title>Login con Supabase</title>
 <!-- Importar el SDK de Supabase desde CDN -->
-<!-- Actualización de despliegue -->).
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
@@ -153,8 +152,8 @@
     const SUPABASE_URL = 'https://afzjwmizqjkizzraqgyp.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_Xcl--San70VszvRyMURKPA_al6Uartj';
 
-    // Inicializar cliente de Supabase
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // Inicializar cliente con un nombre único para evitar el conflicto
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     const form = document.getElementById("loginForm");
     const message = document.getElementById("message");
@@ -170,19 +169,18 @@
       message.className = "";
       submitBtn.disabled = true;
 
-      // Consultar directamente la tabla "users" mediante la Data API de Supabase
-      const { data, error } = await supabase
+      // Consultar la tabla "users" usando supabaseClient
+      const { data, error } = await supabaseClient
         .from('users')
         .select('*')
         .eq('user', usuarioIngresado)
         .eq('pass', passwordIngresado);
 
       if (error) {
-        message.textContent = "❌ Error de conexión con la base de datos.";
+        message.textContent = "❌ Error de conexión: " + error.message;
         message.className = "error";
         submitBtn.disabled = false;
-      } else if (data && data.length >  0) {
-        // Si la consulta devuelve al menos un registro que coincide
+      } else if (data && data.length > 0) {
         message.textContent = "✅ Acceso correcto. Redirigiendo...";
         message.className = "success";
 
@@ -190,7 +188,6 @@
           window.location.href = "explicacion.html";
         }, 1000);
       } else {
-        // Si no encuentra coincidencia
         message.textContent = "❌ Usuario o contraseña incorrectos.";
         message.className = "error";
         submitBtn.disabled = false;
