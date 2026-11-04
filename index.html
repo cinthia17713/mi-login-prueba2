@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login</title>
+<title>Login con Tabla Personalizada en Supabase</title>
+<!-- Importar el SDK de Supabase desde CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
   :root {
     --bg: #f4f6f8;
@@ -13,6 +16,7 @@
     --accent: #4f46e5;
     --accent-hover: #4338ca;
     --error: #dc2626;
+    --success: #16a34a;
     --border: #e5e7eb;
   }
 
@@ -25,6 +29,7 @@
       --accent: #6366f1;
       --accent-hover: #818cf8;
       --error: #f87171;
+      --success: #4ade80;
       --border: #2d303c;
     }
   }
@@ -111,7 +116,7 @@
   }
 
   #message.error { color: var(--error); }
-  #message.success { color: #16a34a; }
+  #message.success { color: var(--success); }
 
   .hint {
     margin-top: 18px;
@@ -129,42 +134,65 @@
 
     <form id="loginForm">
       <label for="username">Usuario</label>
-      <input type="text" id="username" placeholder="admin" autocomplete="username" required>
+      <input type="text" id="username" placeholder="prueba" autocomplete="username" required>
 
       <label for="password">Contraseña</label>
       <input type="password" id="password" placeholder="••••••••" autocomplete="current-password" required>
 
-      <button type="submit">Entrar</button>
+      <button type="submit" id="submitBtn">Entrar</button>
     </form>
 
     <div id="message"></div>
 
-    <p class="hint">Demo — usuario: <strong>admin</strong> · contraseña: <strong>1234</strong></p>
+    <p class="hint">Conectado a la tabla "users" de Supabase</p>
   </div>
 
   <script>
-    // NOTA: Esto es una validación simulada en el navegador (front-end).
-    // GitHub Pages solo sirve archivos estáticos, no tiene backend/base de datos,
-    // así que esto NO es un login real ni seguro para producción.
-    const USUARIO_VALIDO = "admin";
-    const CONTRASENA_VALIDA = "1234";
+    // Tus credenciales de Supabase
+    const SUPABASE_URL = 'https://afzjwmizqjkizzraqgyp.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_Xcl--San70VszvRyMURKPA_al6Uartj';
+
+    // Inicializar cliente de Supabase
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     const form = document.getElementById("loginForm");
     const message = document.getElementById("message");
+    const submitBtn = document.getElementById("submitBtn");
 
-    form.addEventListener("submit", function (e) {
+    form.addEventListener("submit", async function (e) {
       e.preventDefault();
 
-      const usuario = document.getElementById("username").value.trim();
-      const contrasena = document.getElementById("password").value.trim();
+      const usuarioIngresado = document.getElementById("username").value.trim();
+      const passwordIngresado = document.getElementById("password").value.trim();
 
-      if (usuario === USUARIO_VALIDO && contrasena === CONTRASENA_VALIDA) {
+      message.textContent = "Verificando en la base de datos...";
+      message.className = "";
+      submitBtn.disabled = true;
+
+      // Consultar directamente la tabla "users" mediante la Data API de Supabase
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('user', usuarioIngresado)
+        .eq('pass', passwordIngresado);
+
+      if (error) {
+        message.textContent = "❌ Error de conexión con la base de datos.";
+        message.className = "error";
+        submitBtn.disabled = false;
+      } else if (data && data.length >  0) {
+        // Si la consulta devuelve al menos un registro que coincide
         message.textContent = "✅ Acceso correcto. Redirigiendo...";
         message.className = "success";
-        window.location.href = "publicar-github.html";
+
+        setTimeout(() => {
+          window.location.href = "explicacion.html";
+        }, 1000);
       } else {
+        // Si no encuentra coincidencia
         message.textContent = "❌ Usuario o contraseña incorrectos.";
         message.className = "error";
+        submitBtn.disabled = false;
       }
     });
   </script>
